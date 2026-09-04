@@ -53,11 +53,14 @@ export default function Footer() {
         </nav>
       </div>
 
-      <div className="border-t border-white/5 px-6 py-6 lg:px-12">
-        <p className="text-xs leading-relaxed text-brand-muted">
-          Built with React, TypeScript, Tailwind CSS, GSAP &amp; TMDB. This
-          product uses the TMDB API but is not endorsed or certified by TMDB.
-        </p>
+      <div className="border-t border-white/5">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-6 text-xs text-brand-muted sm:flex-row sm:items-center sm:justify-between lg:px-12">
+          <p>Built with React, TypeScript, Tailwind CSS, GSAP &amp; TMDB.</p>
+          <p>
+            This product uses the TMDB API but is not endorsed or certified
+            by TMDB.
+          </p>
+        </div>
       </div>
     </footer>
   )
