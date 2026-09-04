@@ -51,6 +51,11 @@
     background-color: var(--color-brand-accent);
     color: var(--color-brand-text);
   }
+
+  /* Tailwind resets buttons to cursor: default — bring pointer back. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
