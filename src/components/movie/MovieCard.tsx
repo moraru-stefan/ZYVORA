@@ -6,9 +6,14 @@ import Rating from './Rating'
 interface MovieCardProps {
   movie: Movie
   className?: string
+  onRemove?: () => void
 }
 
-export default function MovieCard({ movie, className = '' }: MovieCardProps) {
+export default function MovieCard({
+  movie,
+  className = '',
+  onRemove,
+}: MovieCardProps) {
   const poster = getImageUrl(movie.poster_path, 'w342')
   const year = movie.release_date ? movie.release_date.slice(0, 4) : null
 
@@ -34,6 +39,29 @@ export default function MovieCard({ movie, className = '' }: MovieCardProps) {
         <span className="pointer-events-none absolute inset-x-4 bottom-4 hidden translate-y-2 text-xs font-medium tracking-wide text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block">
           View details &rarr;
         </span>
+
+        {onRemove && (
+          <button
+            type="button"
+            aria-label={`Remove ${movie.title} from watchlist`}
+            onClick={(event) => {
+              event.preventDefault()
+              onRemove()
+            }}
+            className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/80 hover:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              className="h-4 w-4"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
       </div>
 
       <div className="space-y-1 p-3">
