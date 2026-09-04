@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Link } from 'react-router-dom'
+import { ScrollTrigger } from '../../animations/gsapConfig'
 
 const links = [
   { to: '/', label: 'Discover' },
@@ -18,10 +19,11 @@ export default function Navbar() {
 
   // Nudge the navbar toward a solid surface once the hero scrolls past.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const trigger = ScrollTrigger.create({
+      start: 0,
+      onUpdate: (self) => setScrolled(self.scroll() > 24),
+    })
+    return () => trigger.kill()
   }, [])
 
   return (

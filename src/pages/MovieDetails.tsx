@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { revealCards } from '../animations/cardAnimation'
+import { animateDetailsEntrance } from '../animations/pageAnimation'
 import CastCard from '../components/movie/CastCard'
 import MovieCard from '../components/movie/MovieCard'
 import MovieGrid from '../components/movie/MovieGrid'
@@ -22,12 +24,29 @@ import type { Movie } from '../types/movie'
 export default function MovieDetails() {
   const { id = '' } = useParams()
   const [trailerOpen, setTrailerOpen] = useState(false)
+  const scopeRef = useRef<HTMLElement>(null)
+  const castRowRef = useRef<HTMLDivElement>(null)
 
   const details = useMovieDetails(id)
   const credits = useMovieCredits(id)
   const videos = useMovieVideos(id)
   const similar = useSimilarMovies(id)
   const { isInWatchlist, toggleMovie } = useWatchlist()
+  const cast = credits.data?.cast.slice(0, 12) ?? []
+
+  // Backdrop/poster/content entrance, once the movie has loaded.
+  useLayoutEffect(() => {
+    if (!scopeRef.current) return
+    const ctx = animateDetailsEntrance(scopeRef.current)
+    return () => ctx.revert()
+  }, [details.data?.id])
+
+  // Reveal cast cards as the row scrolls into view.
+  useLayoutEffect(() => {
+    if (!castRowRef.current) return
+    const ctx = revealCards(castRowRef.current)
+    return () => ctx.revert()
+  }, [cast.length])
 
   if (details.isLoading) {
     return <LoadingState label="Loading movie..." />
@@ -49,7 +68,6 @@ export default function MovieDetails() {
   const poster = getImageUrl(movie.poster_path, 'w500')
   const year = movie.release_date ? movie.release_date.slice(0, 4) : null
   const trailer = videos.data ? getTrailer(videos.data.results) : undefined
-  const cast = credits.data?.cast.slice(0, 12) ?? []
   const similarMovies = similar.data?.results.slice(0, 10) ?? []
 
   // The watchlist stores plain Movie records, so map genres back to ids.
@@ -67,8 +85,11 @@ export default function MovieDetails() {
   const saved = isInWatchlist(movie.id)
 
   return (
-    <article>
-      <div className="relative h-[42vh] min-h-[280px] w-full overflow-hidden sm:h-[58vh]">
+    <article ref={scopeRef}>
+      <div
+        data-detail="backdrop"
+        className="relative h-[42vh] min-h-[280px] w-full overflow-hidden sm:h-[58vh]"
+      >
         {backdrop ? (
           <img src={backdrop} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -79,7 +100,10 @@ export default function MovieDetails() {
 
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="-mt-20 flex flex-col items-center gap-6 sm:-mt-28 sm:flex-row sm:items-end sm:gap-8 lg:-mt-36">
-          <div className="w-36 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-brand-surface shadow-2xl sm:w-52">
+          <div
+            data-detail="poster"
+            className="w-36 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-brand-surface shadow-2xl sm:w-52"
+          >
             <div className="aspect-2/3">
               {poster ? (
                 <img
@@ -95,7 +119,10 @@ export default function MovieDetails() {
             </div>
           </div>
 
-          <div className="flex-1 pb-2 text-center sm:text-left">
+          <div
+            data-detail="content"
+            className="flex-1 pb-2 text-center sm:text-left"
+          >
             <h1 className="text-3xl font-extrabold tracking-tight text-brand-text sm:text-5xl">
               {movie.title}
             </h1>
@@ -148,7 +175,10 @@ export default function MovieDetails() {
             <h2 className="text-xl font-bold tracking-tight text-brand-text">
               Cast
             </h2>
-            <div className="no-scrollbar mt-6 flex gap-5 overflow-x-auto pb-2">
+            <div
+              ref={castRowRef}
+              className="no-scrollbar mt-6 flex gap-5 overflow-x-auto pb-2"
+            >
               {cast.map((member) => (
                 <CastCard key={member.id} member={member} />
               ))}

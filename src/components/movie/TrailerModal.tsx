@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { gsap, prefersReducedMotion } from '../../animations/gsapConfig'
 import type { Video } from '../../types/movie'
 
 interface TrailerModalProps {
@@ -13,6 +14,20 @@ export default function TrailerModal({
   isOpen,
   onClose,
 }: TrailerModalProps) {
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Track whether we're mid exit-animation, so the modal stays mounted
+  // long enough to play it. Adjusted during render, per React's guidance
+  // for resetting state when a prop changes (no Effect needed for this).
+  const [isClosing, setIsClosing] = useState(false)
+  const [prevOpen, setPrevOpen] = useState(isOpen)
+  if (isOpen !== prevOpen) {
+    setPrevOpen(isOpen)
+    setIsClosing(!isOpen && !prefersReducedMotion())
+  }
+  const visible = isOpen || isClosing
+
   // Close on Escape and lock page scroll while the modal is open.
   useEffect(() => {
     if (!isOpen) return
@@ -30,10 +45,40 @@ export default function TrailerModal({
     }
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
+  useLayoutEffect(() => {
+    if (!visible || prefersReducedMotion()) return
+
+    if (isOpen) {
+      gsap.fromTo(
+        overlayRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3 },
+      )
+      gsap.fromTo(
+        panelRef.current,
+        { opacity: 0, scale: 0.96, y: 12 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'power3.out' },
+      )
+      return
+    }
+
+    if (isClosing) {
+      const tl = gsap.timeline({ onComplete: () => setIsClosing(false) })
+      tl.to(panelRef.current, {
+        opacity: 0,
+        scale: 0.96,
+        y: 12,
+        duration: 0.25,
+        ease: 'power2.in',
+      }).to(overlayRef.current, { opacity: 0, duration: 0.2 }, 0)
+    }
+  }, [isOpen, isClosing, visible])
+
+  if (!visible) return null
 
   return (
     <div
+      ref={overlayRef}
       role="dialog"
       aria-modal="true"
       aria-label="Movie trailer"
@@ -41,6 +86,7 @@ export default function TrailerModal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         className="relative w-full max-w-3xl"
         onClick={(event) => event.stopPropagation()}
       >

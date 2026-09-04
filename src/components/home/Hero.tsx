@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { animateHero } from '../../animations/heroAnimation'
 import { buttonClasses, Button } from '../../components/ui/Button'
 import ErrorState from '../../components/ui/ErrorState'
 import Rating from '../../components/movie/Rating'
@@ -14,11 +15,19 @@ import { getImageUrl, getTrailer } from '../../services/tmdb'
 
 export default function Hero() {
   const [trailerOpen, setTrailerOpen] = useState(false)
+  const heroRef = useRef<HTMLElement>(null)
   const { data: trending, isLoading, isError, refetch } = useTrendingMovies()
 
   const featured = trending?.results[0]
   const { data: details } = useMovieDetails(String(featured?.id ?? ''))
   const { data: videos } = useMovieVideos(String(featured?.id ?? ''))
+
+  // Runs the entrance timeline once the real hero (not the skeleton) mounts.
+  useLayoutEffect(() => {
+    if (!heroRef.current) return
+    const ctx = animateHero(heroRef.current)
+    return () => ctx.revert()
+  }, [featured?.id])
 
   if (isLoading) return <HeroSkeleton />
 
@@ -42,8 +51,11 @@ export default function Hero() {
   const trailer = videos ? getTrailer(videos.results) : undefined
 
   return (
-    <section className="relative flex min-h-[92vh] items-end overflow-hidden pb-20 pt-32 lg:pb-28">
-      <div className="absolute inset-0 -z-10">
+    <section
+      ref={heroRef}
+      className="relative flex min-h-[92vh] items-end overflow-hidden pb-20 pt-32 lg:pb-28"
+    >
+      <div data-hero="image" className="absolute inset-0 -z-10">
         {backdrop ? (
           <img src={backdrop} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -54,13 +66,22 @@ export default function Hero() {
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-12">
-        <p className="text-xs font-semibold tracking-[0.3em] text-brand-accent-2">
+        <p
+          data-hero="label"
+          className="text-xs font-semibold tracking-[0.3em] text-brand-accent-2"
+        >
           FEATURED MOVIE
         </p>
-        <h1 className="mt-4 max-w-3xl text-5xl leading-[0.95] font-extrabold tracking-tight text-brand-text sm:text-6xl lg:text-7xl">
+        <h1
+          data-hero="title"
+          className="mt-4 max-w-3xl text-5xl leading-[0.95] font-extrabold tracking-tight text-brand-text sm:text-6xl lg:text-7xl"
+        >
           {featured.title}
         </h1>
-        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-brand-muted">
+        <div
+          data-hero="meta"
+          className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-brand-muted"
+        >
           {year && <span>{year}</span>}
           {details?.runtime ? (
             <span>{formatRuntime(details.runtime)}</span>
@@ -69,11 +90,14 @@ export default function Hero() {
           {genres && <span className="hidden sm:inline">{genres}</span>}
         </div>
         {featured.overview && (
-          <p className="mt-5 max-w-xl text-brand-muted line-clamp-3">
+          <p
+            data-hero="description"
+            className="mt-5 max-w-xl text-brand-muted line-clamp-3"
+          >
             {featured.overview}
           </p>
         )}
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div data-hero="actions" className="mt-8 flex flex-wrap gap-3">
           <Button size="lg" onClick={() => setTrailerOpen(true)}>
             Watch Trailer
           </Button>
