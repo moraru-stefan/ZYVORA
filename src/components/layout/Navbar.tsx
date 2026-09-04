@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import {
   gsap,
   prefersReducedMotion,
@@ -12,6 +12,9 @@ const links = [
   { to: '/watchlist', label: 'Watchlist' },
 ]
 
+// Watchlist gets its own icon button on mobile, so skip it in the dropdown.
+const mobileMenuLinks = links.filter((link) => link.to !== '/watchlist')
+
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `relative py-1 text-sm transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-brand-accent-2 after:transition-all after:duration-300 hover:after:w-full ${
     isActive ? 'text-brand-text' : 'text-brand-muted hover:text-brand-text'
@@ -22,6 +25,14 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLUListElement>(null)
   const isFirstRender = useRef(true)
+  const location = useLocation()
+  const [prevPathname, setPrevPathname] = useState(location.pathname)
+
+  // Close the mobile menu on any navigation, not just its own links.
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname)
+    setMenuOpen(false)
+  }
 
   // Nudge the navbar toward a solid surface once the hero scrolls past.
   useEffect(() => {
@@ -96,6 +107,17 @@ export default function Navbar() {
           >
             <SearchIcon />
           </Link>
+          <NavLink
+            to="/watchlist"
+            aria-label="Watchlist"
+            className={({ isActive }) =>
+              `rounded-full p-2 transition-colors hover:bg-white/5 hover:text-brand-text md:hidden ${
+                isActive ? 'text-brand-text' : 'text-brand-muted'
+              }`
+            }
+          >
+            {({ isActive }) => <HeartIcon filled={isActive} />}
+          </NavLink>
           <button
             type="button"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -114,7 +136,7 @@ export default function Navbar() {
         ref={menuRef}
         className="flex flex-col gap-1 overflow-hidden border-t border-white/5 bg-brand-bg/95 px-6 backdrop-blur-md md:hidden"
       >
-        {links.map((link) => (
+        {mobileMenuLinks.map((link) => (
           <li key={link.label} className="py-1 first:pt-4 last:pb-4">
             <NavLink
               to={link.to}
@@ -142,6 +164,24 @@ function SearchIcon() {
     >
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function HeartIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth={1.8}
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 20.5s-7.5-4.6-10-9.3C.5 7.8 2.4 4.5 6 4c2-.3 3.8.7 6 3 2.2-2.3 4-3.3 6-3 3.6.5 5.5 3.8 4 7.2-2.5 4.7-10 9.3-10 9.3Z"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }

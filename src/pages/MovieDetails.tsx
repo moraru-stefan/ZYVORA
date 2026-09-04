@@ -156,14 +156,19 @@ export default function MovieDetails() {
           {movie.overview || 'No overview is available for this movie yet.'}
         </p>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-3 sm:justify-start">
-          <Button size="lg" onClick={() => setTrailerOpen(true)}>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={() => setTrailerOpen(true)}
+          >
             Watch Trailer
           </Button>
           <Button
             size="lg"
             variant="secondary"
             aria-pressed={saved}
+            className="w-full sm:w-auto"
             onClick={() => toggleMovie(watchlistMovie)}
           >
             {saved ? 'In Watchlist' : 'Add to Watchlist'}
