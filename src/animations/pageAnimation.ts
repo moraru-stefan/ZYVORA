@@ -10,8 +10,16 @@ export function animateDetailsEntrance(scope: HTMLElement) {
       .timeline({ defaults: { ease: 'power3.out', duration: 0.9 } })
       .fromTo(
         '[data-detail="backdrop"]',
-        { opacity: 0, scale: 1.08 },
-        { opacity: 1, scale: 1, duration: 1.2 },
+        { opacity: 0 },
+        { opacity: 1, duration: 1.2 },
+        0,
+      )
+      // Scale only the image inside its already-clipped frame, not the
+      // frame itself, so the animation can't push the page wider.
+      .fromTo(
+        '[data-detail="backdrop-image"]',
+        { scale: 1.08 },
+        { scale: 1, duration: 1.2 },
         0,
       )
       .from('[data-detail="poster"]', { opacity: 0, y: 40 }, 0.25)

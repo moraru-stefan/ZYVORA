@@ -91,7 +91,12 @@ export default function MovieDetails() {
         className="relative h-[42vh] min-h-[280px] w-full overflow-hidden sm:h-[58vh]"
       >
         {backdrop ? (
-          <img src={backdrop} alt="" className="h-full w-full object-cover" />
+          <img
+            src={backdrop}
+            alt=""
+            data-detail="backdrop-image"
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-brand-accent/30 to-brand-accent-2/20" />
         )}

@@ -31,6 +31,10 @@
 
   html {
     scroll-behavior: smooth;
+    /* A scaled GSAP element (e.g. the details backdrop) can otherwise
+       briefly grow the page's scrollable width and nudge the fixed
+       navbar's icons sideways while it animates. */
+    overflow-x: hidden;
   }
 
   body {

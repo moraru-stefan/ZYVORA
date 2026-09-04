@@ -55,9 +55,14 @@ export default function Hero() {
       ref={heroRef}
       className="relative isolate flex min-h-[92vh] items-end overflow-hidden pb-20 pt-32 lg:pb-28"
     >
-      <div data-hero="image" className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
         {backdrop ? (
-          <img src={backdrop} alt="" className="h-full w-full object-cover" />
+          <img
+            src={backdrop}
+            alt=""
+            data-hero="image"
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-brand-accent/30 to-brand-accent-2/20" />
         )}
