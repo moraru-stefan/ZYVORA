@@ -9,7 +9,8 @@ import Watchlist from './pages/Watchlist'
 
 function App() {
   return (
-    <div className="flex min-h-screen flex-col bg-brand-bg text-brand-text">
+    <div className="relative isolate flex min-h-screen flex-col bg-brand-bg text-brand-text">
+      <AmbientBackground />
       <Navbar />
       <main className="flex-1">
         <Routes>
@@ -21,6 +22,21 @@ function App() {
         </Routes>
       </main>
       <Footer />
+    </div>
+  )
+}
+
+// Soft, fixed accent glows so the page doesn't read as flat black
+// once scrolled past the hero's own gradients.
+function AmbientBackground() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    >
+      <div className="absolute -top-32 left-[8%] h-[26rem] w-[26rem] rounded-full bg-brand-accent/20 blur-[130px]" />
+      <div className="absolute top-1/3 -right-32 h-[24rem] w-[24rem] rounded-full bg-brand-accent-2/15 blur-[130px]" />
+      <div className="absolute bottom-0 left-1/4 h-[22rem] w-[22rem] rounded-full bg-brand-accent/10 blur-[130px]" />
     </div>
   )
 }
