@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { ScrollTrigger } from '../../animations/gsapConfig'
+import {
+  gsap,
+  prefersReducedMotion,
+  ScrollTrigger,
+} from '../../animations/gsapConfig'
 
 const links = [
   { to: '/', label: 'Discover' },
@@ -16,6 +20,8 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLUListElement>(null)
+  const isFirstRender = useRef(true)
 
   // Nudge the navbar toward a solid surface once the hero scrolls past.
   useEffect(() => {
@@ -25,6 +31,33 @@ export default function Navbar() {
     })
     return () => trigger.kill()
   }, [])
+
+  // Slide the mobile menu open/closed instead of popping it in and out.
+  useLayoutEffect(() => {
+    if (!menuRef.current) return
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      gsap.set(menuRef.current, { height: 0, opacity: 0 })
+      return
+    }
+
+    if (prefersReducedMotion()) {
+      gsap.set(menuRef.current, {
+        height: menuOpen ? 'auto' : 0,
+        opacity: menuOpen ? 1 : 0,
+      })
+      return
+    }
+
+    gsap.to(menuRef.current, {
+      height: menuOpen ? 'auto' : 0,
+      opacity: menuOpen ? 1 : 0,
+      duration: 0.35,
+      ease: menuOpen ? 'power3.out' : 'power2.in',
+      overwrite: 'auto',
+    })
+  }, [menuOpen])
 
   return (
     <header
@@ -76,24 +109,23 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {menuOpen && (
-        <ul
-          id="mobile-menu"
-          className="flex flex-col gap-1 border-t border-white/5 bg-brand-bg/95 px-6 py-4 backdrop-blur-md md:hidden"
-        >
-          {links.map((link) => (
-            <li key={link.label}>
-              <NavLink
-                to={link.to}
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-sm text-brand-muted transition-colors hover:bg-white/5 hover:text-brand-text"
-              >
-                {link.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul
+        id="mobile-menu"
+        ref={menuRef}
+        className="flex flex-col gap-1 overflow-hidden border-t border-white/5 bg-brand-bg/95 px-6 backdrop-blur-md md:hidden"
+      >
+        {links.map((link) => (
+          <li key={link.label} className="py-1 first:pt-4 last:pb-4">
+            <NavLink
+              to={link.to}
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-lg px-3 py-2.5 text-sm text-brand-muted transition-colors hover:bg-white/5 hover:text-brand-text"
+            >
+              {link.label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </header>
   )
 }
