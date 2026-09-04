@@ -53,7 +53,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative flex min-h-[92vh] items-end overflow-hidden pb-20 pt-32 lg:pb-28"
+      className="relative isolate flex min-h-[92vh] items-end overflow-hidden pb-20 pt-32 lg:pb-28"
     >
       <div data-hero="image" className="absolute inset-0 -z-10">
         {backdrop ? (
