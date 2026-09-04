@@ -67,13 +67,14 @@ export default function Search() {
 
         <div className="relative mx-auto mt-8 max-w-xl">
           <input
-            type="search"
+            type="text"
             value={searchTerm}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder="Search movies..."
             aria-label="Search movies"
-            className="w-full rounded-full border border-white/10 bg-brand-surface px-6 py-4 text-brand-text placeholder:text-brand-muted focus:border-brand-accent-2/50 focus:outline-none"
+            autoComplete="off"
+            className="w-full rounded-full border border-white/10 bg-brand-surface px-6 py-4 pr-12 text-brand-text placeholder:text-brand-muted focus:border-brand-accent-2/50 focus:outline-none"
           />
           {searchTerm && (
             <button
