@@ -9,7 +9,10 @@ export default function TrendingSection() {
   const { data, isLoading, isError, refetch } = useTrendingMovies()
 
   return (
-    <section id="trending" className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
+    <section
+      id="trending"
+      className="mx-auto max-w-7xl scroll-mt-24 px-6 py-16 lg:px-12"
+    >
       <SectionHeader
         title="Trending now"
         subtitle="What everyone is watching."
