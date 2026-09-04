@@ -54,3 +54,7 @@ export interface VideosResponse {
   id: number
   results: Video[]
 }
+
+export interface GenreResponse {
+  genres: Genre[]
+}

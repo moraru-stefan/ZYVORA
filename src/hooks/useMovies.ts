@@ -11,6 +11,8 @@ export const movieKeys = {
   credits: (id: string) => ['movie', id, 'credits'] as const,
   videos: (id: string) => ['movie', id, 'videos'] as const,
   similar: (id: string) => ['movie', id, 'similar'] as const,
+  genres: ['genres'] as const,
+  byGenre: (genreId: string) => ['movies', 'genre', genreId] as const,
 }
 
 export function useTrendingMovies() {
@@ -71,5 +73,17 @@ export function useSimilarMovies(id: string) {
     queryKey: movieKeys.similar(id),
     queryFn: () => tmdb.getSimilarMovies(id),
     enabled: Boolean(id),
+  })
+}
+
+export function useGenres() {
+  return useQuery({ queryKey: movieKeys.genres, queryFn: tmdb.getGenres })
+}
+
+export function useMoviesByGenre(genreId: string) {
+  return useQuery({
+    queryKey: movieKeys.byGenre(genreId),
+    queryFn: () => tmdb.discoverMoviesByGenre(genreId),
+    enabled: Boolean(genreId),
   })
 }

@@ -1,5 +1,6 @@
 import type {
   CreditsResponse,
+  GenreResponse,
   MovieDetails,
   MovieResponse,
   Video,
@@ -90,4 +91,15 @@ export function getMovieVideos(id: string) {
 
 export function getSimilarMovies(id: string) {
   return tmdbFetch<MovieResponse>(`/movie/${id}/similar`)
+}
+
+export function getGenres() {
+  return tmdbFetch<GenreResponse>('/genre/movie/list')
+}
+
+export function discoverMoviesByGenre(genreId: string) {
+  return tmdbFetch<MovieResponse>('/discover/movie', {
+    with_genres: genreId,
+    sort_by: 'popularity.desc',
+  })
 }
