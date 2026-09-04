@@ -57,8 +57,8 @@ export default function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-6 text-xs text-brand-muted sm:flex-row sm:items-center sm:justify-between lg:px-12">
           <p>Built with React, TypeScript, Tailwind CSS, GSAP &amp; TMDB.</p>
           <p>
-            This product uses the TMDB API but is not endorsed or certified
-            by TMDB.
+            This product uses the TMDB API but is not endorsed or certified by
+            TMDB.
           </p>
         </div>
       </div>
